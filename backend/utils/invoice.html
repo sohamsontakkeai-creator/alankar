@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Proforma Invoice</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      color: #000;
+      background: #fff;
+      margin: 20px;
+      font-size: 13px;
+    }
+    .sheet {
+      width: 900px;
+      margin: auto;
+      border: 1px solid #000;
+      padding: 20px;
+    }
+    .header, .buyer, .consignee, .footer {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .header td, .buyer td, .consignee td, .footer td {
+      padding: 5px;
+      vertical-align: top;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    table.main, table.totals, table.tax {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .main th, .main td, .totals th, .totals td, .tax th, .tax td {
+      border: 1px solid #000;
+      padding: 6px;
+      vertical-align: top;
+    }
+    .main th {
+      background: #f3f3f3;
+    }
+    .amount-right {
+      text-align: right;
+    }
+    .center {
+      text-align: center;
+    }
+    .footer-section {
+      margin-top: 25px;
+      font-size: 12px;
+    }
+    .declaration {
+      border: 1px solid #000;
+      padding: 8px;
+      margin-top: 20px;
+      font-size: 12px;
+    }
+    .signature {
+      float: right;
+      text-align: center;
+      margin-top: 30px;
+    }
+    .signature .line {
+      border-top: 1px solid #000;
+      width: 160px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="title">PROFORMA INVOICE</div>
+    <div class="subtitle">
+      <strong>ALANKAR ENGINEERING EQUIPMENTS PVT LTD</strong><br>
+      H-6/5, MIDC, Chikalthana, Ch. Sambhajinagar - 431001<br>
+      GSTIN/UIN: 27AAACA6767K1ZN | State Name: Maharashtra (27)
+    </div>
+
+    <table class="header">
+      <tr>
+        <td><strong>Invoice No.:</strong> {{ order_number }}</td>
+        <td><strong>Date:</strong> {{ order_date }}</td>
+        <td><strong>Mode/Terms of Payment:</strong> 100% ADVANCE</td>
+      </tr>
+      <tr>
+        <td><strong>Delivery Note:</strong> -</td>
+        <td><strong>Reference No. & Date:</strong> {{ reference_no or "YOGESH SIR - " ~ order_date }}</td>
+        <td><strong>Dispatched through:</strong> BY ROAD</td>
+      </tr>
+    </table>
+
+    <hr>
+
+    <table class="buyer">
+      <tr>
+        <td width="50%">
+          <strong>Buyer (Bill to)</strong><br>
+          {{ customer_name }}<br>
+          {{ customer_address }}<br>
+          Contact: {{ customer_contact }}<br>
+          State: Maharashtra | GSTIN: 27AAACA6767K1ZN
+        </td>
+        <td width="50%">
+          <strong>Consignee (Ship to)</strong><br>
+          {{ customer_name }}<br>
+          {{ customer_address }}<br>
+          State: Maharashtra
+        </td>
+      </tr>
+    </table>
+
+    <table class="main">
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Description of Goods</th>
+          <th>HSN/SAC</th>
+          <th>Quantity</th>
+          <th>Rate</th>
+          <th>Per</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td class="center">{{ loop.index }}</td>
+          <td>{{ item.description }}</td>
+          <td class="center">{{ item.hsn }}</td>
+          <td class="center">{{ "%.3f"|format(item.qty) }}</td>
+          <td class="amount-right">{{ "%.2f"|format(item.rate) }}</td>
+          <td class="center">NOS</td>
+          <td class="amount-right">{{ "%.2f"|format(item.qty * item.rate) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <table class="totals" style="width:300px;float:right;margin-top:15px;">
+      <tr><td>Taxable Value</td><td class="amount-right">₹ {{ "%.2f"|format(subtotal) }}</td></tr>
+      <tr><td>CGST @ 9%</td><td class="amount-right">₹ {{ "%.2f"|format(cgst_amount) }}</td></tr>
+      <tr><td>SGST @ 9%</td><td class="amount-right">₹ {{ "%.2f"|format(sgst_amount) }}</td></tr>
+      <tr><td><strong>Total</strong></td><td class="amount-right"><strong>₹ {{ "%.2f"|format(final_amount) }}</strong></td></tr>
+    </table>
+
+    <div style="clear:both;"></div>
+
+    <div class="footer-section">
+      <strong>Amount Chargeable (in words):</strong><br>
+      INR {{ amount_words }} Only
+    </div>
+
+    <table class="tax" style="margin-top:15px;">
+      <thead>
+        <tr>
+          <th>HSN/SAC</th>
+          <th>Taxable</th>
+          <th>CGST Rate</th>
+          <th>CGST Amt</th>
+          <th>SGST Rate</th>
+          <th>SGST Amt</th>
+          <th>Total Tax Amt</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td class="center">{{ item.hsn }}</td>
+          <td class="amount-right">{{ "%.2f"|format(item.qty * item.rate) }}</td>
+          <td class="center">9%</td>
+          <td class="amount-right">{{ "%.2f"|format((item.qty * item.rate) * 0.09) }}</td>
+          <td class="center">9%</td>
+          <td class="amount-right">{{ "%.2f"|format((item.qty * item.rate) * 0.09) }}</td>
+          <td class="amount-right">{{ "%.2f"|format((item.qty * item.rate) * 0.18) }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td><strong>Total</strong></td>
+          <td class="amount-right"><strong>{{ "%.2f"|format(subtotal) }}</strong></td>
+          <td></td><td class="amount-right"><strong>{{ "%.2f"|format(cgst_amount) }}</strong></td>
+          <td></td><td class="amount-right"><strong>{{ "%.2f"|format(sgst_amount) }}</strong></td>
+          <td class="amount-right"><strong>{{ "%.2f"|format(cgst_amount + sgst_amount) }}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="declaration">
+      <strong>Declaration:</strong><br>
+      We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.
+    </div>
+
+    <div class="signature">
+      <div class="line"></div>
+      <div>Authorised Signatory</div>
+    </div>
+  </div>
+</body>
+</html>
