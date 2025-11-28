@@ -558,7 +558,7 @@ class TransportService:
 
                     part_load_detail = PartLoadDetail(
                         sales_order_id=dispatch_request.sales_order_id,
-                        transporter_name=driver_details.get('transporterName'),
+                        transporter_name=driver_details.get('companyName') or driver_details.get('transporterName'),
                         expected_delivery_date=expected_delivery_date,
                         payment_type=payment_type,  # Use payment type from sales order
                         customer_name=dispatch_request.party_name,
@@ -571,7 +571,7 @@ class TransportService:
             else:
                 # Update existing record
                 try:
-                    part_load_detail.transporter_name = driver_details.get('transporterName')
+                    part_load_detail.transporter_name = driver_details.get('companyName') or driver_details.get('transporterName')
                     if driver_details.get('expectedDeliveryDate'):
                         date_str = driver_details.get('expectedDeliveryDate')
                         try:
@@ -599,6 +599,7 @@ class TransportService:
                     print(f"Error updating PartLoadDetail: {str(e)}")
                     raise
             transport_job.status = 'driver_assigned'  # New status for part load with driver details
+            transport_job.transporter_name = driver_details.get('companyName')  # Save company name
             transport_job.updated_at = get_ist_now()
             
             # Import GatePass here to avoid circular imports
