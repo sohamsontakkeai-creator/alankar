@@ -57,7 +57,7 @@ def create_app(config_name=None):
     CORS(
         app,
         origins=[
-            "https://erp-ct75.vercel.app",
+            "https://sohamsontakkeai-creator-alankar.vercel.app",
             "https://erp-latest.vercel.app",
             "http://localhost:5173",  # local testing
         ],
