@@ -516,8 +516,11 @@ const TransportDepartment = () => {
         // Only clear selected order after successful submit
         setSelectedPartLoadOrder(null);
         
-        // Refresh the orders list
-        await fetchPartLoadOrders();
+        // Refresh both the orders lists to show updated data immediately
+        await Promise.all([
+          fetchPartLoadOrders(true),
+          fetchCompletedPartLoads(true)
+        ]);
       } else {
         throw new Error(data.error || "Failed to save after delivery details");
       }
