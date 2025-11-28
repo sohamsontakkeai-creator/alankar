@@ -460,6 +460,16 @@ const handleCreateOrder = async () => {
             return;
         }
 
+        // ✅ For Part Load with "Paid" payment type, make sure transport cost is filled
+        if (orderForm.deliveryType === 'part load' && orderForm.paymentType === 'paid' && (!orderForm.transportCost || orderForm.transportCost <= 0)) {
+            toast({
+                title: 'Missing Information',
+                description: 'Transport cost is required for part load delivery with "Paid" payment type. Please add the transport cost.',
+                variant: 'destructive'
+            });
+            return;
+        }
+
         // For Part Load and Company Delivery orders, determine if transport approval is needed
         const needsTransportApproval = orderForm.deliveryType === 'part load' || orderForm.deliveryType === 'company delivery';
         
