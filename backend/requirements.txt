@@ -4,6 +4,7 @@ Flask-SQLAlchemy==3.0.5
 Flask-CORS==4.0.0
 Flask-Mail==0.9.1
 Flask-Session>=0.5.0
+Flask-JWT-Extended==4.4.4
 
 # WebSocket Support (Real-time updates)
 Flask-SocketIO==5.5.1
